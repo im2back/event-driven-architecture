@@ -21,11 +21,16 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<OrderResponse> create(@Valid @RequestBody CreateOrderRequest request) {
+    public ResponseEntity<OrderResponse> create(
+            @RequestHeader("Idempotency-Key") String idempotencyKey,
+            @Valid @RequestBody CreateOrderRequest request ) {
 
         Order order = OrderMapper.toEntity(request);
 
-        Order createdOrder = orderService.create(order);
+        Order createdOrder = orderService.create(
+                idempotencyKey,
+                order
+        );
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
