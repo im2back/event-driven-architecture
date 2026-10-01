@@ -15,9 +15,7 @@ public class OutboxEventService {
 
     private final OutboxEventRepository outboxEventRepository;
 
-    public OutboxEventService(
-            OutboxEventRepository outboxEventRepository
-    ) {
+    public OutboxEventService(OutboxEventRepository outboxEventRepository) {
         this.outboxEventRepository = outboxEventRepository;
     }
 
@@ -41,9 +39,9 @@ public class OutboxEventService {
         return outboxEventRepository.save(outboxEvent);
     }
 
+    @Transactional
     public List<OutboxEvent> findPending() {
-        return outboxEventRepository
-                .findByStatusOrderByCreatedAtAsc(OutboxStatus.PENDING);
+        return outboxEventRepository.findPendingForUpdate();
     }
 
     @Transactional
