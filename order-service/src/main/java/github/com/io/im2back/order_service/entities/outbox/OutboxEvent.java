@@ -22,9 +22,6 @@ public class OutboxEvent {
     @Column(name = "aggregate_id", nullable = false)
     private Long aggregateId;
 
-    @Column(name = "routing_key", nullable = false)
-    private String routingKey;
-
     @Lob
     @Column(nullable = false)
     private String payload;
@@ -49,14 +46,12 @@ public class OutboxEvent {
             UUID eventId,
             String eventType,
             Long aggregateId,
-            String routingKey,
             String payload,
             OutboxStatus status
     ) {
         this.eventId = eventId;
         this.eventType = eventType;
         this.aggregateId = aggregateId;
-        this.routingKey = routingKey;
         this.payload = payload;
         this.status = status;
         this.attempts = 0;
@@ -77,10 +72,6 @@ public class OutboxEvent {
 
     public Long getAggregateId() {
         return aggregateId;
-    }
-
-    public String getRoutingKey() {
-        return routingKey;
     }
 
     public String getPayload() {

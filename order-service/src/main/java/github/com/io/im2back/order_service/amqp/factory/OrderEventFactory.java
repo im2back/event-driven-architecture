@@ -1,6 +1,6 @@
 package github.com.io.im2back.order_service.amqp.factory;
-import github.com.io.im2back.order_service.amqp.factory.model.OrderCreatedEvent;
-import github.com.io.im2back.order_service.amqp.factory.model.OrderStatusUpdatedEvent;
+
+import github.com.io.im2back.order_service.amqp.factory.model.OrderEventPayload;
 import github.com.io.im2back.order_service.entities.order.Order;
 import github.com.io.im2back.order_service.event.model.OrderEventType;
 import org.springframework.stereotype.Component;
@@ -11,31 +11,13 @@ import java.util.UUID;
 @Component
 public class OrderEventFactory {
 
-    public Object from(Order order, OrderEventType eventType) {
-
-        return switch (eventType) {
-            case CREATED -> created(order);
-            case STATUS_UPDATED -> statusUpdated(order);
-        };
-    }
-
-    private OrderCreatedEvent created(Order order) {
-
-        return new OrderCreatedEvent(
+    public OrderEventPayload from(
+            Order order,
+            OrderEventType eventType
+    ) {
+        return new OrderEventPayload(
                 UUID.randomUUID(),
-                "OrderCreated",
-                order.getId(),
-                order.getOrderNumber(),
-                order.getTableNumber(),
-                LocalDateTime.now()
-        );
-    }
-
-    private OrderStatusUpdatedEvent statusUpdated(Order order) {
-
-        return new OrderStatusUpdatedEvent(
-                UUID.randomUUID(),
-                "OrderStatusUpdated",
+                eventType.name(),
                 order.getId(),
                 order.getOrderNumber(),
                 order.getTableNumber(),

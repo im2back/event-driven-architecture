@@ -4,6 +4,7 @@ import github.com.io.im2back.order_service.amqp.factory.OrderEventFactory;
 import github.com.io.im2back.order_service.amqp.publisher.OrderEventPublisher;
 
 import github.com.io.im2back.order_service.event.model.OrderApplicationEvent;
+import github.com.io.im2back.order_service.service.OutboxEventService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -13,20 +14,23 @@ public class OrderEventListener {
 
     private final OrderEventPublisher orderEventPublisher;
     private final OrderEventFactory orderEventFactory;
+    private final OutboxEventService outboxEventService;
 
     public OrderEventListener(
             OrderEventPublisher orderEventPublisher,
-            OrderEventFactory orderEventFactory
+            OrderEventFactory orderEventFactory,
+            OutboxEventService outboxEventService
     ) {
         this.orderEventPublisher = orderEventPublisher;
         this.orderEventFactory = orderEventFactory;
+        this.outboxEventService = outboxEventService;
     }
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void handle(OrderApplicationEvent event) {
 
-        orderEventPublisher.publish(orderEventFactory.from(event.order(), event.eventType()),
-                event.eventType()
-        );
+        var payload = orderEventFactory.from(event.order(), event.eventType());
+
+        outboxEventService.savePending(payload);
     }
 }
