@@ -2,7 +2,7 @@ package github.com.io.im2back.order_service.controller.mapper;
 
 import github.com.io.im2back.order_service.controller.dto.in.CreateOrderRequest;
 import github.com.io.im2back.order_service.controller.dto.out.OrderResponse;
-import github.com.io.im2back.order_service.entity.Order;
+import github.com.io.im2back.order_service.entities.order.Order;
 
 public final class OrderMapper {
 

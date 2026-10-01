@@ -1,6 +1,6 @@
 package github.com.io.im2back.order_service.amqp.factory.model;
 
-import github.com.io.im2back.order_service.entity.OrderStatus;
+import github.com.io.im2back.order_service.entities.order.OrderStatus;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

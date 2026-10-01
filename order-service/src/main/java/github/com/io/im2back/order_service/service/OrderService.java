@@ -1,8 +1,8 @@
 package github.com.io.im2back.order_service.service;
 
 
-import github.com.io.im2back.order_service.entity.Order;
-import github.com.io.im2back.order_service.entity.OrderStatus;
+import github.com.io.im2back.order_service.entities.order.Order;
+import github.com.io.im2back.order_service.entities.order.OrderStatus;
 import github.com.io.im2back.order_service.event.listener.OrderEventNotifier;
 import github.com.io.im2back.order_service.event.model.OrderEventType;
 import github.com.io.im2back.order_service.repository.OrderRepository;

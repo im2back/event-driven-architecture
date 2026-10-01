@@ -1,4 +1,4 @@
-package github.com.io.im2back.order_service.entity;
+package github.com.io.im2back.order_service.entities.order;
 
 import jakarta.persistence.*;
 

@@ -1,7 +1,7 @@
 package github.com.io.im2back.order_service.amqp.factory;
 import github.com.io.im2back.order_service.amqp.factory.model.OrderCreatedEvent;
 import github.com.io.im2back.order_service.amqp.factory.model.OrderStatusUpdatedEvent;
-import github.com.io.im2back.order_service.entity.Order;
+import github.com.io.im2back.order_service.entities.order.Order;
 import github.com.io.im2back.order_service.event.model.OrderEventType;
 import org.springframework.stereotype.Component;
 

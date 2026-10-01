@@ -3,7 +3,7 @@ package github.com.io.im2back.order_service.controller;
 import github.com.io.im2back.order_service.controller.dto.in.CreateOrderRequest;
 import github.com.io.im2back.order_service.controller.dto.out.OrderResponse;
 import github.com.io.im2back.order_service.controller.mapper.OrderMapper;
-import github.com.io.im2back.order_service.entity.Order;
+import github.com.io.im2back.order_service.entities.order.Order;
 import github.com.io.im2back.order_service.service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

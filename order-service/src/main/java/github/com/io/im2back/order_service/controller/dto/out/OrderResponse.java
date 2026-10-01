@@ -1,6 +1,6 @@
 package github.com.io.im2back.order_service.controller.dto.out;
 
-import github.com.io.im2back.order_service.entity.OrderStatus;
+import github.com.io.im2back.order_service.entities.order.OrderStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

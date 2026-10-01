@@ -1,5 +1,5 @@
 package github.com.io.im2back.order_service.repository;
-import github.com.io.im2back.order_service.entity.Order;
+import github.com.io.im2back.order_service.entities.order.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
