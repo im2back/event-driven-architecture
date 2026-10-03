@@ -30,5 +30,6 @@ public class OutboxScheduler {
         for (OutboxEvent event : events) {
             orderEventPublisher.publish(event.getPayload(), OrderEventType.valueOf(event.getEventType()));
         }
+        outboxEventService.markAsPublished(events);
     }
 }

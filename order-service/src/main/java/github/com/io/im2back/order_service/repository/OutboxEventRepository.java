@@ -2,8 +2,11 @@ package github.com.io.im2back.order_service.repository;
 import github.com.io.im2back.order_service.entities.outbox.OutboxEvent;
 import github.com.io.im2back.order_service.entities.outbox.OutboxStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,4 +24,12 @@ public interface OutboxEventRepository extends JpaRepository<OutboxEvent, UUID> 
             nativeQuery = true
     )
     List<OutboxEvent> findPendingForUpdate();
+
+    @Modifying
+    @Query("""
+    UPDATE OutboxEvent o
+    SET o.status = 'PUBLISHED', o.publishedAt = :publishedAt
+    WHERE o.id IN :ids
+""")
+    int markAsPublished(@Param("ids") List<UUID> ids, @Param("publishedAt") LocalDateTime publishedAt);
 }

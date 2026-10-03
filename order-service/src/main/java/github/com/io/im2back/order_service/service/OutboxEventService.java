@@ -58,12 +58,8 @@ public class OutboxEventService {
         return outboxEventRepository.findPendingForUpdate();
     }
 
-    @Transactional
-    public void markAsPublished(OutboxEvent event) {
-
-        event.setStatus(OutboxStatus.PUBLISHED);
-        event.setPublishedAt(LocalDateTime.now());
-
-        outboxEventRepository.save(event);
+    public void markAsPublished(List<OutboxEvent> events) {
+        List<UUID> ids = events.stream().map(OutboxEvent::getId).toList();
+        outboxEventRepository.markAsPublished(ids, LocalDateTime.now());
     }
 }
