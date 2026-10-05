@@ -1,5 +1,6 @@
-package github.com.io.im2back.workflow_service.entities;
+package github.com.io.im2back.workflow_service.entities.instance;
 
+import github.com.io.im2back.workflow_service.entities.transition.WorkflowState;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
