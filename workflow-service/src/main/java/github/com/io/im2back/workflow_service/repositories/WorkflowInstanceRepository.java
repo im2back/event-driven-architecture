@@ -1,4 +1,4 @@
-package repositories;
+package github.com.io.im2back.workflow_service.repositories;
 
 
 import github.com.io.im2back.workflow_service.entities.instance.WorkflowInstance;
