@@ -7,6 +7,7 @@ import github.com.io.im2back.workflow_service.entities.instance.WorkflowInstance
 import github.com.io.im2back.workflow_service.entities.transition.WorkflowState;
 import github.com.io.im2back.workflow_service.entities.transition.WorkflowTransition;
 import github.com.io.im2back.workflow_service.entities.transitionaction.WorkflowTransitionAction;
+import github.com.io.im2back.workflow_service.event.listener.WorkflowEventNotifier;
 import github.com.io.im2back.workflow_service.repositories.WorkflowInstanceRepository;
 import github.com.io.im2back.workflow_service.repositories.WorkflowTransitionActionRepository;
 import github.com.io.im2back.workflow_service.repositories.WorkflowTransitionRepository;
@@ -21,20 +22,17 @@ public class WorkflowService {
     private final WorkflowInstanceRepository workflowInstanceRepository;
     private final WorkflowTransitionRepository workflowTransitionRepository;
     private final WorkflowTransitionActionRepository workflowTransitionActionRepository;
+    private final WorkflowEventNotifier workflowEventNotifier;
 
-    public WorkflowService(
-            WorkflowInstanceRepository workflowInstanceRepository,
-            WorkflowTransitionRepository workflowTransitionRepository,
-            WorkflowTransitionActionRepository workflowTransitionActionRepository) {
+    public WorkflowService(WorkflowInstanceRepository workflowInstanceRepository, WorkflowTransitionRepository workflowTransitionRepository, WorkflowTransitionActionRepository workflowTransitionActionRepository, WorkflowEventNotifier workflowEventNotifier) {
         this.workflowInstanceRepository = workflowInstanceRepository;
         this.workflowTransitionRepository = workflowTransitionRepository;
         this.workflowTransitionActionRepository = workflowTransitionActionRepository;
+        this.workflowEventNotifier = workflowEventNotifier;
     }
 
     @Transactional
-    public List<WorkflowTransitionAction> process(
-            WorkflowEventPayload<? extends WorkflowEventsData> event) {
-
+    public void process(WorkflowEventPayload<? extends WorkflowEventsData> event) {
         WorkflowEventType eventType = WorkflowEventType.valueOf(event.eventType());
 
         WorkflowInstance instance = workflowInstanceRepository.findByOrderId(event.orderId())
@@ -48,7 +46,9 @@ public class WorkflowService {
         instance.changeState(transition.getNextState());
         workflowInstanceRepository.save(instance);
 
-        return workflowTransitionActionRepository.findByTransition(transition);
+        List<WorkflowTransitionAction> actions = workflowTransitionActionRepository.findByTransition(transition);
+
+        workflowEventNotifier.notify(event, actions);
     }
 
     private WorkflowInstance createInitialInstance(Long orderId, WorkflowEventType eventType) {

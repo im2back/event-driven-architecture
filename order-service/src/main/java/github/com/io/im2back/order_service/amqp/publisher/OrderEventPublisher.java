@@ -35,9 +35,7 @@ public class OrderEventPublisher {
         Message message = MessageBuilder.withBody(payload.getBytes(StandardCharsets.UTF_8))
                 .setContentType(MessageProperties.CONTENT_TYPE_JSON)
                 .build();
-        System.out.println("EXCHANGE: " + exchange);
-        System.out.println("routingKey: " + routingKey);
-        System.out.println("EXCHANGE: " + message);
+
         rabbitTemplate.send(exchange, routingKey, message);
     }
 
