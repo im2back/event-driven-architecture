@@ -1,5 +1,6 @@
 package github.com.io.im2back.order_service.amqp.factory;
 
+import github.com.io.im2back.order_service.amqp.factory.model.OrderCreatedEventsData;
 import github.com.io.im2back.order_service.amqp.factory.model.OrderEventPayload;
 import github.com.io.im2back.order_service.entities.order.Order;
 import github.com.io.im2back.order_service.event.model.OrderEventType;
@@ -11,18 +12,22 @@ import java.util.UUID;
 @Component
 public class OrderEventFactory {
 
-    public OrderEventPayload from(
-            Order order,
-            OrderEventType eventType
-    ) {
-        return new OrderEventPayload(
+    public OrderEventPayload<OrderCreatedEventsData> from(Order order, OrderEventType eventType) {
+
+        OrderCreatedEventsData eventsData = new OrderCreatedEventsData(
+                order.getTableNumber(),
+                order.getTotalAmount(),
+                order.getCurrency(),
+                order.getStatus()
+        );
+
+        return new OrderEventPayload<>(
                 UUID.randomUUID(),
                 eventType.name(),
                 order.getId(),
                 order.getOrderNumber(),
-                order.getTableNumber(),
-                order.getStatus(),
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                eventsData
         );
     }
 }

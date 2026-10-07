@@ -1,13 +1,9 @@
-package github.com.io.im2back.order_service.amqp.factory.model;
+package github.com.io.im2back.workflow_service.amqp.dto.input;
 
-import github.com.io.im2back.order_service.entities.order.OrderStatus;
-
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-
-public record OrderEventPayload<T>(
+public record WorkflowEventPayload<T>(
         UUID eventId,
         String eventType,
         Long orderId,

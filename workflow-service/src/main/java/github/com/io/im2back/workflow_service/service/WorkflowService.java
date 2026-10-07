@@ -1,5 +1,7 @@
 package github.com.io.im2back.workflow_service.service;
 
+import github.com.io.im2back.workflow_service.amqp.dto.input.WorkflowEventPayload;
+import github.com.io.im2back.workflow_service.amqp.dto.input.WorkflowEventsData;
 import github.com.io.im2back.workflow_service.entities.instance.WorkflowEventType;
 import github.com.io.im2back.workflow_service.entities.instance.WorkflowInstance;
 import github.com.io.im2back.workflow_service.entities.transition.WorkflowState;
@@ -30,10 +32,13 @@ public class WorkflowService {
     }
 
     @Transactional
-    public List<WorkflowTransitionAction> process(Long orderId, WorkflowEventType eventType) {
+    public List<WorkflowTransitionAction> process(
+            WorkflowEventPayload<? extends WorkflowEventsData> event) {
 
-        WorkflowInstance instance = workflowInstanceRepository.findByOrderId(orderId)
-                .orElseGet(() -> createInitialInstance(orderId, eventType));
+        WorkflowEventType eventType = WorkflowEventType.valueOf(event.eventType());
+
+        WorkflowInstance instance = workflowInstanceRepository.findByOrderId(event.orderId())
+                .orElseGet(() -> createInitialInstance(event.orderId(), eventType));
 
         WorkflowTransition transition = workflowTransitionRepository
                 .findByCurrentStateAndEventType(instance.getCurrentState(), eventType)
