@@ -43,7 +43,7 @@ public class OrderEventPublisher {
 
     private String getRoutingKey(OrderEventType eventType) {
         String routingKey = switch (eventType) {
-            case CREATED -> orderCreatedRoutingKey;
+            case ORDER_CREATED -> orderCreatedRoutingKey;
             case STATUS_UPDATED -> orderStatusUpdatedRoutingKey;
         };
         return routingKey;

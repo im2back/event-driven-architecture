@@ -36,7 +36,7 @@ public class OrderService {
         order.setStatus(OrderStatus.CREATED);
         Order savedOrder = orderRepository.save(order);
 
-        orderEventNotifier.notify(savedOrder, OrderEventType.CREATED);
+        orderEventNotifier.notify(savedOrder, OrderEventType.ORDER_CREATED);
 
         return savedOrder;
     }
