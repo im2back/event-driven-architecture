@@ -36,7 +36,11 @@ public class OrderCommandListener {
         OrderCommandPayload<?> typedCommand = orderCommandDataFactory.create(command);
 
         if (typedCommand.eventsData() instanceof UpdateOrderStatusEventsData data) {
-            orderService.updateStatus(typedCommand.orderId(), data.status());
+            orderService.updateStatus(
+                    typedCommand.orderId(),
+                    data.status(),
+                    typedCommand.version()
+            );
         }
     }
 }

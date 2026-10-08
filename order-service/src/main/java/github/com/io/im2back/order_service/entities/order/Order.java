@@ -13,63 +13,39 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(
-            name = "order_number",
-            nullable = false,
-            unique = true
-    )
+    @Column(name = "order_number", nullable = false, unique = true)
     private String orderNumber;
 
-    @Column(
-            name = "table_number",
-            nullable = false
-    )
+    @Column(name = "table_number", nullable = false)
     private Integer tableNumber;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OrderStatus status;
 
-    @Column(
-            name = "total_amount",
-            nullable = false,
-            precision = 12,
-            scale = 2
-    )
+    @Column(name = "workflow_version", nullable = false)
+    private Long workflowVersion;
+
+    @Column(name = "total_amount", nullable = false, precision = 12, scale = 2)
     private BigDecimal totalAmount;
 
-    @Column(
-            nullable = false,
-            length = 3
-    )
+    @Column(nullable = false, length = 3)
     private String currency;
 
-    @Column(
-            name = "created_at",
-            nullable = false,
-            updatable = false
-    )
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(
-            name = "updated_at",
-            nullable = false
-    )
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
     protected Order() {
     }
 
-    public Order(
-            String orderNumber,
-            Integer tableNumber,
-            OrderStatus status,
-            BigDecimal totalAmount,
-            String currency
-    ) {
+    public Order(String orderNumber, Integer tableNumber, OrderStatus status, BigDecimal totalAmount, String currency) {
         this.orderNumber = orderNumber;
         this.tableNumber = tableNumber;
         this.status = status;
+        this.workflowVersion = 0L;
         this.totalAmount = totalAmount;
         this.currency = currency;
     }
@@ -112,6 +88,14 @@ public class Order {
 
     public void setStatus(OrderStatus status) {
         this.status = status;
+    }
+
+    public Long getWorkflowVersion() {
+        return workflowVersion;
+    }
+
+    public void setWorkflowVersion(Long workflowVersion) {
+        this.workflowVersion = workflowVersion;
     }
 
     public BigDecimal getTotalAmount() {

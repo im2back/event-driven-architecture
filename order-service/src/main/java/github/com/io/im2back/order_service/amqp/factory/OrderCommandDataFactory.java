@@ -16,16 +16,20 @@ public class OrderCommandDataFactory {
 
     public OrderCommandPayload<?> create(OrderCommandPayload<?> command) {
         return switch (command.eventType()) {
+
             case "UPDATE_ORDER_STATUS" -> new OrderCommandPayload<>(
                     command.eventId(),
                     command.eventType(),
                     command.orderId(),
                     command.orderNumber(),
+                    command.version(),
                     command.createdAt(),
                     objectMapper.convertValue(command.eventsData(), UpdateOrderStatusEventsData.class)
             );
 
-            default -> throw new IllegalArgumentException("Unsupported command type: " + command.eventType());
+            default -> throw new IllegalArgumentException(
+                    "Unsupported command type: " + command.eventType()
+            );
         };
     }
 }

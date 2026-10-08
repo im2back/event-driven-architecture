@@ -80,11 +80,16 @@ public class OrderService {
     }
 
     @Transactional
-    public Order updateStatus(Long orderId, String status) {
+    public Order updateStatus(Long orderId, String status, Long version) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
 
+        if (version <= order.getWorkflowVersion()) {
+            return order;
+        }
+
         order.setStatus(OrderStatus.valueOf(status));
+        order.setWorkflowVersion(version);
 
         return orderRepository.save(order);
     }
