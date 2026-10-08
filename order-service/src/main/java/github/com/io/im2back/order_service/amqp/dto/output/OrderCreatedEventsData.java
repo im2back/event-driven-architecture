@@ -1,4 +1,4 @@
-package github.com.io.im2back.order_service.amqp.factory.model;
+package github.com.io.im2back.order_service.amqp.dto.output;
 
 import github.com.io.im2back.order_service.entities.order.OrderStatus;
 

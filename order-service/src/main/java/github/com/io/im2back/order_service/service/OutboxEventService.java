@@ -1,12 +1,10 @@
 package github.com.io.im2back.order_service.service;
 
-import github.com.io.im2back.order_service.amqp.factory.model.OrderEventPayload;
+import github.com.io.im2back.order_service.amqp.dto.output.OrderEventPayload;
 import github.com.io.im2back.order_service.entities.outbox.OutboxEvent;
 import github.com.io.im2back.order_service.entities.outbox.OutboxStatus;
-import github.com.io.im2back.order_service.event.model.OrderEventType;
 
 import github.com.io.im2back.order_service.repository.OutboxEventRepository;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,9 +14,6 @@ import tools.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
-import static github.com.io.im2back.order_service.entities.order.OrderStatus.CREATED;
-import static github.com.io.im2back.order_service.event.model.OrderEventType.STATUS_UPDATED;
 
 @Service
 public class OutboxEventService {
