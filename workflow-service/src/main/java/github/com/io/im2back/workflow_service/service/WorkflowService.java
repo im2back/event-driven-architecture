@@ -48,7 +48,7 @@ public class WorkflowService {
 
         List<WorkflowTransitionAction> actions = workflowTransitionActionRepository.findByTransition(transition);
 
-        workflowEventNotifier.notify(event, actions);
+        workflowEventNotifier.notify(event, actions, instance.getVersion());
     }
 
     private WorkflowInstance createInitialInstance(Long orderId, WorkflowEventType eventType) {

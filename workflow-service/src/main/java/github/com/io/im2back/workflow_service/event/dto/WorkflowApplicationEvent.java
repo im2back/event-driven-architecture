@@ -8,6 +8,7 @@ import java.util.List;
 
 public record WorkflowApplicationEvent(
         WorkflowEventPayload<? extends WorkflowEventsData> event,
-        List<WorkflowTransitionAction> actions
+        List<WorkflowTransitionAction> actions,
+        Long version
 ) {
 }

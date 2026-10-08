@@ -15,7 +15,7 @@ import java.util.UUID;
 @Component
 public class WorkflowCommandFactory {
 
-    public WorkflowCommandPayload<?> create(WorkflowTransitionAction action, WorkflowEventPayload<? extends WorkflowEventsData> event) {
+    public WorkflowCommandPayload<?> create(WorkflowTransitionAction action, WorkflowEventPayload<? extends WorkflowEventsData> event, Long version) {
         return switch (action.getActionType()) {
 
             case PROCESS_PAYMENT -> {
@@ -28,6 +28,7 @@ public class WorkflowCommandFactory {
                         action.getActionType().name(),
                         event.orderId(),
                         event.orderNumber(),
+                        version,
                         LocalDateTime.now(),
                         new ProcessPaymentEventsData(data.totalAmount(), data.currency())
                 );
@@ -38,6 +39,7 @@ public class WorkflowCommandFactory {
                     action.getActionType().name(),
                     event.orderId(),
                     event.orderNumber(),
+                    version,
                     LocalDateTime.now(),
                     new UpdateOrderStatusEventsData(action.getActionValue())
             );

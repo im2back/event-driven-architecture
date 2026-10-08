@@ -27,11 +27,21 @@ public class WorkflowApplicationEventListener {
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void handle(WorkflowApplicationEvent event) {
         for (WorkflowTransitionAction action : event.actions()) {
-            WorkflowCommandPayload<?> command = workflowCommandFactory.create(action, event.event());
+            WorkflowCommandPayload<?> command = workflowCommandFactory.create(
+                    action,
+                    event.event(),
+                    event.version()
+            );
 
             try {
                 String payload = objectMapper.writeValueAsString(command);
-                outboxEventService.savePending(command.eventId(), action.getActionType(), command.orderId(), payload);
+
+                outboxEventService.savePending(
+                        command.eventId(),
+                        action.getActionType(),
+                        command.orderId(),
+                        payload
+                );
             } catch (JacksonException e) {
                 throw new RuntimeException("Error serializing workflow command", e);
             }

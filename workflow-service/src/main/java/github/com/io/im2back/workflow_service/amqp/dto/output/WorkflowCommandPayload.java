@@ -8,6 +8,7 @@ public record WorkflowCommandPayload<T>(
         String eventType,
         Long orderId,
         String orderNumber,
+        Long version,
         LocalDateTime createdAt,
         T eventsData
 ) {

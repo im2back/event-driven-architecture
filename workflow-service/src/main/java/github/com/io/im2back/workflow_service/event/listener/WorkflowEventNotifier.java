@@ -20,7 +20,7 @@ public class WorkflowEventNotifier {
         this.eventPublisher = eventPublisher;
     }
 
-    public void notify(WorkflowEventPayload<? extends WorkflowEventsData> event, List<WorkflowTransitionAction> actions) {
-        eventPublisher.publishEvent(new WorkflowApplicationEvent(event, actions));
+    public void notify(WorkflowEventPayload<? extends WorkflowEventsData> event, List<WorkflowTransitionAction> actions, Long version) {
+        eventPublisher.publishEvent(new WorkflowApplicationEvent(event, actions, version));
     }
 }

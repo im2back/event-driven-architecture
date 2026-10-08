@@ -13,6 +13,9 @@ public class WorkflowInstance {
     @Id
     private UUID id;
 
+    @Column(nullable = false)
+    private Long version;
+
     @Column(name = "order_id", nullable = false, unique = true)
     private Long orderId;
 
@@ -31,6 +34,7 @@ public class WorkflowInstance {
 
     public WorkflowInstance(Long orderId, WorkflowState currentState) {
         this.id = UUID.randomUUID();
+        this.version = 0L;
         this.orderId = orderId;
         this.currentState = currentState;
         this.createdAt = LocalDateTime.now();
@@ -39,6 +43,10 @@ public class WorkflowInstance {
 
     public UUID getId() {
         return id;
+    }
+
+    public Long getVersion() {
+        return version;
     }
 
     public Long getOrderId() {
@@ -59,6 +67,7 @@ public class WorkflowInstance {
 
     public void changeState(WorkflowState newState) {
         this.currentState = newState;
+        this.version++;
         this.updatedAt = LocalDateTime.now();
     }
 }
