@@ -78,4 +78,14 @@ public class OrderService {
 
         orderRepository.delete(order);
     }
+
+    @Transactional
+    public Order updateStatus(Long orderId, String status) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+
+        order.setStatus(OrderStatus.valueOf(status));
+
+        return orderRepository.save(order);
+    }
 }
