@@ -4,6 +4,8 @@ Projeto de estudo e implementação prática de uma arquitetura orientada a even
 
 O projeto utiliza **RabbitMQ** como Message Broker e adota uma topologia do tipo **Mediator / Orchestrator**, na qual o `workflow-service` coordena o fluxo entre os demais serviços sem acoplá-los diretamente entre si.
 
+> **Observação:** o `payment-service` e o `kitchen-service` são apenas ilustrativos e **não foram implementados** neste projeto. A interação entre o `order-service` e o `workflow-service` já demonstra o fluxo completo e passa pelos principais conceitos e camadas implementados: a requisição cria o pedido, o evento é persistido/publicado via Outbox, o Workflow consome e processa o evento, resolve a transição e suas actions, gera novos comandos, publica no RabbitMQ e o Order Service consome o comando e atualiza o pedido com idempotência, ACK, DLQ/reprocessamento e controle de versão. Por isso, a implementação dos serviços de pagamento e cozinha não é necessária para demonstrar os objetivos técnicos deste projeto.
+
 ---
 
 ## Objetivo
@@ -19,8 +21,10 @@ Entre os conceitos aplicados estão:
 - Mediator / Orchestrator
 - Transactional Outbox Pattern
 - Consumer Acknowledgement
+- Publisher Confirm
 - Redelivery
 - Retry
+- Dead Letter Queue (DLQ) e reprocessamento
 - Idempotência
 - At Least Once Delivery
 - Versionamento / Sequence Number para controle de ordenação lógica
@@ -265,6 +269,28 @@ RabbitMQ pode entregar novamente
 
 ---
 
+## Dead Letter Queue (DLQ) e reprocessamento
+
+A **Dead Letter Queue (DLQ)** recebe mensagens que não conseguiram ser processadas com sucesso após as tentativas previstas.
+
+```text
+mensagem
+↓
+processamento falha
+↓
+retry / redelivery
+↓
+limite de tentativas atingido
+↓
+DLQ
+```
+
+A DLQ evita ciclos infinitos de falha no fluxo principal e permite que mensagens problemáticas sejam analisadas e posteriormente **reprocessadas** de forma controlada.
+
+O reprocessamento da DLQ permite devolver a mensagem ao fluxo após a causa da falha ser identificada ou corrigida.
+
+---
+
 ## Consumer Acknowledgement
 
 O **ACK** confirma ao RabbitMQ que uma mensagem foi processada com sucesso.
@@ -290,6 +316,28 @@ ACK
 Se uma exceção interromper o processamento, a mensagem não é considerada processada com sucesso.
 
 O ACK é importante para garantir que a mensagem não seja removida da fila antes da conclusão do processamento.
+
+---
+
+## Publisher Confirm
+
+O **Publisher Confirm** é a confirmação do RabbitMQ para o produtor de que a mensagem foi recebida pelo broker.
+
+No fluxo com Outbox:
+
+```text
+Outbox PENDING
+↓
+publicação no RabbitMQ
+↓
+Publisher Confirm
+↓
+marca como PUBLISHED
+```
+
+Isso complementa o Transactional Outbox, evitando considerar uma mensagem como publicada antes da confirmação do broker.
+
+> **Importante:** Publisher Confirm e Consumer Acknowledgement são mecanismos diferentes. O primeiro confirma o recebimento pelo broker no lado do produtor; o segundo confirma o processamento no lado do consumidor.
 
 ---
 
@@ -585,6 +633,7 @@ Maven
 
 # Estrutura dos serviços
 
+
 ## Order Service
 
 Responsável pelo domínio de pedidos.
@@ -619,7 +668,7 @@ idempotência AMQP
 versionamento lógico
 ```
 
-## Payment Service
+## Payment Service (ilustrativo)
 
 Responsável pelo processamento de pagamentos.
 
@@ -634,6 +683,12 @@ através da fila:
 ```text
 payment.commands.queue
 ```
+
+## Kitchen Service (ilustrativo)
+
+Representa o serviço responsável pelo fluxo de preparação do pedido.
+
+Ele aparece no desenho arquitetural para demonstrar a continuidade natural da orquestração, mas não foi implementado, pois o fluxo entre `order-service` e `workflow-service` já cobre os conceitos técnicos avaliados neste projeto.
 
 ---
 
@@ -683,38 +738,20 @@ RabbitMQ
 
 # Conceitos de confiabilidade aplicados
 
-| Problema                                    | Estratégia                         |
-| ------------------------------------------- | ---------------------------------- |
-| Falha entre banco e publicação              | Transactional Outbox               |
-| Mensagem duplicada                          | Idempotência                       |
-| Consumer falha durante processamento        | ACK + Redelivery                   |
-| Falha temporária                            | Retry                              |
-| Entrega uma ou mais vezes                   | At Least Once                      |
-| Mensagens fora de ordem                     | Sequence Number / Workflow Version |
-| Concorrência entre instâncias de consumidor | Metadata Store compartilhado       |
-| Acoplamento entre serviços                  | Event-Driven + Broker              |
-| Coordenação do processo                     | Mediator / Workflow                |
-
----
-
-# Próximas evoluções
-
-Algumas evoluções naturais para o projeto são:
-
-```text
-Publisher Confirm
-Dead Letter Queue (DLQ)
-políticas explícitas de retry e backoff
-Payment Service completo
-Preparation Service
-observabilidade com métricas, logs e tracing distribuído
-testes de integração com RabbitMQ
-Testcontainers
-```
-
-O **Publisher Confirm** permitirá que o produtor confirme explicitamente que o RabbitMQ recebeu a mensagem antes de marcar o registro do Outbox como publicado.
-
-A **DLQ** permitirá separar mensagens que falharam repetidamente para posterior análise ou reprocessamento.
+| Problema                                        | Estratégia                         |
+| ----------------------------------------------- | ---------------------------------- |
+| Falha entre banco e publicação                  | Transactional Outbox               |
+| Confirmar recebimento da publicação pelo broker | Publisher Confirm                  |
+| Consumer falha durante processamento            | Consumer ACK + Redelivery          |
+| Falha temporária                                | Retry                              |
+| Mensagem falha repetidamente                    | Dead Letter Queue (DLQ)            |
+| Recuperar mensagens da DLQ após correção        | Reprocessamento da DLQ             |
+| Mensagem duplicada                              | Idempotência                       |
+| Entrega uma ou mais vezes                       | At Least Once                      |
+| Mensagens fora de ordem                         | Sequence Number / Workflow Version |
+| Concorrência entre instâncias de consumidor     | Metadata Store compartilhado       |
+| Acoplamento entre serviços                      | Event-Driven + Broker              |
+| Coordenação do processo                         | Mediator / Workflow                |
 
 ---
 
@@ -735,11 +772,15 @@ RabbitMQ
 +
 Transactional Outbox
 +
-Idempotência
+Publisher Confirm
 +
-Acknowledgement
+Consumer Acknowledgement
 +
 Retry / Redelivery
++
+Dead Letter Queue (DLQ) + reprocessamento
++
+Idempotência
 +
 At Least Once
 +
